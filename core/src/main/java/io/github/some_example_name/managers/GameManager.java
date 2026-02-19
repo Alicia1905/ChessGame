@@ -2,73 +2,89 @@ package io.github.some_example_name.managers;
 
 import io.github.some_example_name.entities.Board;
 import io.github.some_example_name.entities.Move;
+import io.github.some_example_name.entities.Pawn;
 import io.github.some_example_name.entities.Piece;
+import io.github.some_example_name.entities.Queen;
+
 
 import java.util.List;
 
 public class GameManager {
-
-    private Board board;
-    private boolean isWhiteTurn = true;  // Blanc joue en premier
+    private final Board board;
+    private boolean whiteTurn = true; // Blanc commence
 
     public GameManager() {
-        board = new Board();
+        this.board = new Board();
     }
 
-    // Démarre le jeu (ici juste un log pour debug) et affiche le plateau
     public void startGame() {
         System.out.println("Jeu d'échecs démarré !");
-        // Si tu veux afficher le plateau dans la console
-        // board.printBoard();
     }
 
-    // Tente de déplacer une pièce de (startX,startY) vers (endX,endY) 
+    // Déplace une pièce si le coup est le bon
     public boolean movePiece(int startX, int startY, int endX, int endY) {
         Piece piece = board.getPiece(startX, startY);
         if (piece == null) return false;
 
-        // Vérifie que c’est bien le tour du joueur
-        if (piece.isWhite() != isWhiteTurn) return false;
+        // tour du joueur
+        if (piece.isWhite() != whiteTurn) return false;
 
-        // Vérifie que le coup est possible selon les règles de la pièce
-        if (!piece.isValidMove(endX, endY, board)) return false;
+        Move move = new Move(startX, startY, endX, endY);
 
-        // Applique le coup
-        board.setPiece(endX, endY, piece);
-        board.setPiece(startX, startY, null);
-        piece.setPosition(endX, endY);
+        // vérifier que le coup est légal (ne met pas son roi en échec)
+        if (!isLegalMove(move)) return false;
 
-        // Change le tour
-        isWhiteTurn = !isWhiteTurn;
+        // appliquer via Board 
+        board.makeMove(move);
+        Promotion(move.endX, move.endY);
+
+
+        // changer de tour
+        whiteTurn = !whiteTurn;
 
         return true;
     }
 
-    // Renvoie le plateau actuel 
+    private boolean isLegalMove(Move move) {
+        // On prend tous les coups légaux du joueur et on compare
+        List<Move> legalMoves = board.getAllLegalMoves(whiteTurn);
+
+        for (Move m : legalMoves) {
+            if (m.startX == move.startX && m.startY == move.startY
+                    && m.endX == move.endX && m.endY == move.endY) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Board getBoard() {
         return board;
     }
 
-    // Renvoie le joueur qui doit jouer (true = blanc, false = noir) 
     public boolean getCurrentPlayer() {
-        return isWhiteTurn;
+        return whiteTurn;
     }
 
-    // Renvoie tous les coups possibles pour le joueur actuel 
     public List<Move> getLegalMoves() {
-        return board.getAllLegalMoves(isWhiteTurn);
+        return board.getAllLegalMoves(whiteTurn);
     }
 
-    // Méthode de debug : fait avancer le pion blanc de (0,1) à (0,3) si possible
-    public void debugMovePawn() {
-        List<Move> moves = getLegalMoves();
-        for (Move m : moves) {
-            if (m.startX == 0 && m.startY == 1 && m.endX == 0 && m.endY == 3) {
-                movePiece(m.startX, m.startY, m.endX, m.endY);
-                break;
-            }
+    private void Promotion(int x, int y) {
+        Piece piece = board.getPiece(x, y);
+
+        if (piece == null) return;
+
+        // Si c'est un pion blanc arrivé en haut
+        if (piece instanceof Pawn && piece.isWhite() && y == 7) {
+            board.setPiece(x, y, new Queen(true));
+        }
+
+        // Si c'est un pion noir arrivé en bas
+        if (piece instanceof Pawn && !piece.isWhite() && y == 0) {
+            board.setPiece(x, y, new Queen(false));
         }
     }
+
 }
-
-

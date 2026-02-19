@@ -85,7 +85,7 @@ public class Board {
         // retire la pièce de départ
         grid[move.startX][move.startY] = null;
 
-        // pose la pièce (capture si nécessaire)
+        // pose la pièce 
         setPiece(move.endX, move.endY, piece);
     }
 

@@ -5,7 +5,6 @@ import io.github.some_example_name.screens.GameScreen;
 import io.github.some_example_name.utils.Assets;
 
 public class Main extends Game {
-
     public Assets assets;
 
     @Override
