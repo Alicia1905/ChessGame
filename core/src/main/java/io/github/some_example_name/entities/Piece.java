@@ -23,13 +23,26 @@ public abstract class Piece {
         return y;
     }
 
-    // Idéalement: ne l’appeler QUE depuis Board.setPiece / Board.makeMove
+    // Met à jour la position de la pièce (après un déplacement)
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public abstract List<Move> getPossibleMoves(Board board);
+
+    // Vérifie si un coup est valide pour cette pièce (en se basant sur les coups possibles)
+    public boolean isValidMove(int targetX, int targetY, Board board) {
+        List<Move> moves = getPossibleMoves(board);
+
+        for (Move m : moves) {
+            if (m.endX == targetX && m.endY == targetY) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public abstract String getSymbol();
 
@@ -38,5 +51,6 @@ public abstract class Piece {
         return getClass().getSimpleName() + "(" + (isWhite ? "White" : "Black") + ")@" + x + "," + y;
     }
 }
+
 
 

@@ -4,12 +4,11 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
 public class Assets {
-
     public final AssetManager manager = new AssetManager();
 
-    // Textures plateau
-    public Texture darkTile;
-    public Texture lightTile;
+    // Textures du plateau
+    public Texture dark;
+    public Texture light;
 
     // Pièces blanches
     public Texture wPawn, wRook, wKnight, wBishop, wQueen, wKing;
@@ -43,8 +42,8 @@ public class Assets {
         manager.finishLoading();
 
         // Récupération des assets
-        darkTile  = manager.get("pieces/square_brown_dark.png", Texture.class);
-        lightTile = manager.get("pieces/square_brown_light.png", Texture.class);
+        dark  = manager.get("pieces/square_brown_dark.png", Texture.class);
+        light = manager.get("pieces/square_brown_light.png", Texture.class);
 
         wPawn   = manager.get("pieces/w_pawn.png", Texture.class);
         wRook   = manager.get("pieces/w_rook.png", Texture.class);
