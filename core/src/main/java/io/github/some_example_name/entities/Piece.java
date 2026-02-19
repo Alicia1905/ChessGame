@@ -23,7 +23,7 @@ public abstract class Piece {
         return y;
     }
 
-    // Met à jour la position de la pièce (après un déplacement)
+    // Met à jour la position de la pièce 
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
@@ -31,7 +31,7 @@ public abstract class Piece {
 
     public abstract List<Move> getPossibleMoves(Board board);
 
-    // Vérifie si un coup est valide pour cette pièce (en se basant sur les coups possibles)
+    // Vérifie si un coup est valide pour cette pièce 
     public boolean isValidMove(int targetX, int targetY, Board board) {
         List<Move> moves = getPossibleMoves(board);
 
