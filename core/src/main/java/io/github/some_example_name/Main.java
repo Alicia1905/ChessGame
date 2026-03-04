@@ -2,6 +2,7 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import io.github.some_example_name.managers.AudioManager;
 import io.github.some_example_name.screens.GameScreen;
 import io.github.some_example_name.screens.MenuScreen;
 import io.github.some_example_name.screens.OptionsScreen;
@@ -10,12 +11,16 @@ import io.github.some_example_name.utils.Assets;
 public class Main extends Game {
 
     public Assets assets;
+    public AudioManager audio;
 
     @Override
     public void create() {
         assets = new Assets();
         assets.load();
         assets.finishLoading();
+        audio = new AudioManager();
+        audio.load();
+        audio.playBgm();
 
         setScreen(new MenuScreen(this));
     }
@@ -45,6 +50,7 @@ public class Main extends Game {
     @Override
     public void dispose() {
         super.dispose();
+        if (audio != null) audio.dispose();
         if (assets != null) assets.dispose();
     }
 }
