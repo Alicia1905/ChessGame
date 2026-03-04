@@ -13,8 +13,5 @@ dependencies {
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
-    subprojects {
-    tasks.withType(JavaCompile).configureEach {
-        options.release = 21
   }
 }
