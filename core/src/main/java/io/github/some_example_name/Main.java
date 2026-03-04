@@ -1,6 +1,7 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import io.github.some_example_name.screens.GameScreen;
 import io.github.some_example_name.screens.MenuScreen;
 import io.github.some_example_name.screens.OptionsScreen;
@@ -12,7 +13,6 @@ public class Main extends Game {
 
     @Override
     public void create() {
-
         assets = new Assets();
         assets.load();
         assets.finishLoading();
@@ -20,19 +20,26 @@ public class Main extends Game {
         setScreen(new MenuScreen(this));
     }
 
+    /** Change d'écran proprement (évite stages/UI “fantômes”) */
+    private void setScreenSafe(Screen next) {
+        Screen current = getScreen();
+        setScreen(next);
+        if (current != null) current.dispose();
+    }
+
     // démarrer la partie
     public void startGame() {
-        setScreen(new GameScreen(this));
+        setScreenSafe(new GameScreen(this));
     }
 
     // aller au menu
     public void goToMenu() {
-        setScreen(new MenuScreen(this));
+        setScreenSafe(new MenuScreen(this));
     }
 
     // aller aux options
     public void goToOptions() {
-        setScreen(new OptionsScreen(this));
+        setScreenSafe(new OptionsScreen(this));
     }
 
     @Override

@@ -38,12 +38,21 @@ public class MenuScreen extends ScreenAdapter {
         t.add(options).width(240).pad(10).row();
         t.add(quit).width(240).pad(10).row();
 
-        play.addListener(e -> { if (!play.isPressed()) return false; game.startGame(); return true; });
-        options.addListener(e -> { if (!options.isPressed()) return false; game.goToOptions(); return true; });
-        quit.addListener(e -> { if (!quit.isPressed()) return false; Gdx.app.exit(); return true; });
+        play.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+    @Override public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+        game.startGame();
     }
+});
 
-    @Override public void render(float delta) { stage.act(delta); stage.draw(); }
+options.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+    @Override public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+        game.goToOptions();
+    }
+});
 
-    @Override public void dispose() { stage.dispose(); skin.dispose(); }
-}
+quit.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+    @Override public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+        com.badlogic.gdx.Gdx.app.exit();
+    }
+});
+  

@@ -44,11 +44,14 @@ public class EndScreen extends ScreenAdapter
         t.add(replay).width(240).pad(10).row();
         t.add(menu).width(240).pad(10).row();
 
-        replay.addListener(e -> { if (!replay.isPressed()) return false; game.startGame(); return true; });
-        menu.addListener(e -> { if (!menu.isPressed()) return false; game.goToMenu(); return true; });
+        replay.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+    @Override public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+        game.startGame();
     }
+});
 
-    @Override public void render(float delta) { stage.act(delta); stage.draw(); }
-
-    @Override public void dispose() { stage.dispose(); skin.dispose(); }
-}
+menu.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+    @Override public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+        game.goToMenu();
+    }
+});
