@@ -1,54 +1,96 @@
 package io.github.some_example_name.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+
 import io.github.some_example_name.Main;
 
-public class EndScreen extends ScreenAdapter 
-{
+public class EndScreen implements Screen {
+
     private final Main game;
-    private final boolean win;
-    private final int score;
+    private final String resultMessage;
 
-    private Stage stage;
-    private Skin skin;
+    private final int whiteScore;
+    private final int blackScore;
 
-    public EndScreen(Main game, boolean win, int score) {
+    private int bestScore;
+
+    private SpriteBatch batch;
+    private BitmapFont font;
+
+    public EndScreen(Main game, String resultMessage, int whiteScore, int blackScore) {
+
         this.game = game;
-        this.win = win;
-        this.score = score;
+        this.resultMessage = resultMessage;
+        this.whiteScore = whiteScore;
+        this.blackScore = blackScore;
+
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+
+        loadBestScore();
+        updateBestScore();
+    }
+
+    // Charger le meilleur score sauvegardé
+    private void loadBestScore() {
+        Preferences prefs = Gdx.app.getPreferences("ChessScores");
+        bestScore = prefs.getInteger("bestScore", 0);
+    }
+
+    // Mettre à jour le record si battu
+    private void updateBestScore() {
+
+        int currentBest = Math.max(whiteScore, blackScore);
+
+        if (currentBest > bestScore) {
+
+            bestScore = currentBest;
+
+            Preferences prefs = Gdx.app.getPreferences("ChessScores");
+            prefs.putInteger("bestScore", bestScore);
+            prefs.flush();
+        }
     }
 
     @Override
-    public void show() {
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
+    public void render(float delta) {
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        Table t = new Table();
-        t.setFillParent(true);
-        stage.addActor(t);
+        batch.begin();
 
-        Label msg = new Label(win ? "TU AS GAGNÉ !" : "TU AS PERDU !", skin);
-        Label sc = new Label("Score: " + score, skin);
+        font.draw(batch, resultMessage, 350, 500);
 
-        TextButton replay = new TextButton("Rejouer", skin);
-        TextButton menu = new TextButton("Menu", skin);
+        font.draw(batch, "Blanc a capturé : " + whiteScore, 330, 420);
+        font.draw(batch, "Noir a capturé : " + blackScore, 330, 380);
 
-        t.add(msg).pad(20).row();
-        t.add(sc).pad(10).row();
-        t.add(replay).width(240).pad(10).row();
-        t.add(menu).width(240).pad(10).row();
+        font.draw(batch, "Best capture score : " + bestScore, 330, 320);
 
-        replay.addListener(e -> { if (!replay.isPressed()) return false; game.startGame(); return true; });
-        menu.addListener(e -> { if (!menu.isPressed()) return false; game.goToMenu(); return true; });
+        font.draw(batch, "Cliquez sur ENTER pour retourner au menu", 300, 250);
+
+        batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            game.setScreen(new MenuScreen(game));
+        }
     }
 
-    @Override public void render(float delta) { stage.act(delta); stage.draw(); }
+    @Override public void show() {}
+    @Override public void resize(int width, int height) {}
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
 
-    @Override public void dispose() { stage.dispose(); skin.dispose(); }
+    @Override
+    public void dispose() {
+        batch.dispose();
+        font.dispose();
+    }
 }

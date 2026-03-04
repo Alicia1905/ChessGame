@@ -6,12 +6,17 @@ import io.github.some_example_name.entities.Pawn;
 import io.github.some_example_name.entities.Piece;
 import io.github.some_example_name.entities.Queen;
 
-
 import java.util.List;
 
 public class GameManager {
+
     private final Board board;
+
     private boolean whiteTurn = true; // Blanc commence
+
+    // Nombre de pions capturés
+    private int whiteCapturedPawns = 0;
+    private int blackCapturedPawns = 0;
 
     public GameManager() {
         this.board = new Board();
@@ -21,23 +26,33 @@ public class GameManager {
         System.out.println("Jeu d'échecs démarré !");
     }
 
-    // Déplace une pièce si le coup est le bon
+    // Déplace une pièce si le coup est valide
     public boolean movePiece(int startX, int startY, int endX, int endY) {
+
         Piece piece = board.getPiece(startX, startY);
         if (piece == null) return false;
 
-        // tour du joueur
         if (piece.isWhite() != whiteTurn) return false;
 
         Move move = new Move(startX, startY, endX, endY);
 
-        // vérifier que le coup est légal (ne met pas son roi en échec)
         if (!isLegalMove(move)) return false;
 
-        // appliquer via Board 
-        board.makeMove(move);
-        Promotion(move.endX, move.endY);
+        Piece captured = board.getPiece(endX, endY);
 
+        if (captured instanceof Pawn) {
+            if (piece.isWhite()) {
+                whiteCapturedPawns++;
+            } else {
+                blackCapturedPawns++;
+            }
+        }
+
+        // appliquer le mouvement
+        board.makeMove(move);
+
+        // promotion éventuelle
+        promotion(move.endX, move.endY);
 
         // changer de tour
         whiteTurn = !whiteTurn;
@@ -46,12 +61,15 @@ public class GameManager {
     }
 
     private boolean isLegalMove(Move move) {
-        // On prend tous les coups légaux du joueur et on compare
+
         List<Move> legalMoves = board.getAllLegalMoves(whiteTurn);
 
         for (Move m : legalMoves) {
-            if (m.startX == move.startX && m.startY == move.startY
-                    && m.endX == move.endX && m.endY == move.endY) {
+            if (m.startX == move.startX &&
+                m.startY == move.startY &&
+                m.endX == move.endX &&
+                m.endY == move.endY) {
+
                 return true;
             }
         }
@@ -71,20 +89,31 @@ public class GameManager {
         return board.getAllLegalMoves(whiteTurn);
     }
 
-    private void Promotion(int x, int y) {
+    // Promotion automatique en reine
+    private void promotion(int x, int y) {
+
         Piece piece = board.getPiece(x, y);
 
         if (piece == null) return;
 
-        // Si c'est un pion blanc arrivé en haut
+        // pion blanc arrivé en haut
         if (piece instanceof Pawn && piece.isWhite() && y == 7) {
             board.setPiece(x, y, new Queen(true));
         }
 
-        // Si c'est un pion noir arrivé en bas
+        // pion noir arrivé en bas
         if (piece instanceof Pawn && !piece.isWhite() && y == 0) {
             board.setPiece(x, y, new Queen(false));
         }
+    }
+
+    // Affichage du score
+    public int getWhiteCapturedPawns() {
+        return whiteCapturedPawns;
+    }
+
+    public int getBlackCapturedPawns() {
+        return blackCapturedPawns;
     }
 
 }
